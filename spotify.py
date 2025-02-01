@@ -1,12 +1,17 @@
 import spotipy
-import os
+import sys
 import logging
 import coloredlogs
 from spotipy.oauth2 import SpotifyOAuth
 from difflib import SequenceMatcher
 
-coloredlogs.install(level=logging.DEBUG)
+# Log initializers
+stdout_handler = logging.StreamHandler(sys.stdout)
+file_handler = logging.FileHandler('logs.log')
+coloredlogs.install(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.addHandler(stdout_handler)
+logger.addHandler(file_handler)
 
 
 class SpotifyAuthManager:
@@ -76,17 +81,24 @@ class SpotifyAuthManager:
             None: Returns None.
         """
 
-        if '' in tracks:
+        # If trying to add a track with ID of '' to playlist and there's only one track provided, work around it.
+        # Todo: Debug why this ID is sometimes blank.
+        if '' in tracks and len(tracks) == 1:
             logger.warning(f"Empty track ID found.")
 
-        logger.debug(f"Track IDs to be added = {tracks}")
-        # If more than 99 tracks, we need to split it into chunks.
-        if len(tracks) >= 99:
-            chunks: list[list] = Utils.divide_chunks(tracks)
-            for chunk in chunks:
-                self.spotify.playlist_add_items(playlist_id, chunk)
-        else:
-            self.spotify.playlist_add_items(playlist_id, tracks)
+        # Here's a lazy workaround for the issue mentioned above.
+        try:
+            logger.debug(f"Track IDs to be added = {tracks}")
+            # If more than 99 tracks, we need to split it into chunks.
+            if len(tracks) >= 99:
+                chunks: list[list] = Utils.divide_chunks(tracks)
+                for chunk in chunks:
+                    self.spotify.playlist_add_items(playlist_id, chunk)
+            else:
+                self.spotify.playlist_add_items(playlist_id, tracks)
+
+        except Exception as e:
+            logger.error(f"Error adding tracks to playlist: {e}")
 
     def add_track_to_playlist(self, playlist_id: str, track_id: str) -> None:
         """
@@ -197,10 +209,6 @@ class SpotifyAuthManager:
 
         track_uris: list[str] = [track["track"]["id"] for track in tracks]
         return track_uris
-    # Gets the n most popular tracks from an album.
-
-    def get_n_most_popular_from_album(self, album_id: str, count: int) -> list:
-        pass
 
 
 class Utils:
