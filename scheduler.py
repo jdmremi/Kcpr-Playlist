@@ -129,6 +129,9 @@ class KcprSpotifyScheduler():
                 # Update the previous data to be currently playing song.
                 self.prev_data = query
 
+                # Add the track ID to the playlist track IDs to avoid duplicates.
+                self.spotify_playlist_track_uris.append(track_uri)
+
             else:
                 logger.debug(f"Track already in playlist: {query}")
         else:
