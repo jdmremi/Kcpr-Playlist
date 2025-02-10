@@ -22,7 +22,7 @@ class KcprHandler:
     """
 
     def __init__(self):
-        self.driver: Driver = Driver(headless=True, uc=True)
+        self.driver: Driver = Driver(headless=True, uc=True, no_sandbox=True)
         self.driver_timeout: int = 10
         self.kcpr_uri: str = "https://streamdb8web.securenetsystems.net/ce/KCPR1"
 
