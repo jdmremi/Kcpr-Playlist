@@ -70,8 +70,15 @@ class KcprSpotifyScheduler():
         # Used to keep track of the tracks in the playlist to avoid duplicates.
         self.spotify_playlist_track_uris: list[str] = self.spotify_handler.get_playlist_tracks(playlist_id=PLAYLIST_ID
                                                                                                )
+        
         # Get the currently playing song
-        self.prev_data: str = self.kcpr_handler.get_now_playing()
+        artist, song = self.kcpr_handler.get_now_playing()
+        
+        # Format query
+        query: str = f"{artist} - {song}"
+
+        # Get the currently playing song
+        self.prev_data: str = query
 
     def __spotify_kcpr_event(self) -> None:
         """
