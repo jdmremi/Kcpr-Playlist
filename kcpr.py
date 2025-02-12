@@ -2,11 +2,46 @@ from typing import Tuple
 from playwright.sync_api import sync_playwright, Browser, Page
 
 class KcprHandler:
+    """
+    A handler class to interact with the KCPR website and retrieve the currently playing song information.
+    Attributes:
+        kcpr_uri (str): The URI of the KCPR website.
+    Methods:
+        get_now_playing() -> Tuple[str, str]:
+            Retrieves the artist name and song title of the currently playing song from the KCPR website.
+    """
+        """
+        Initializes the KcprHandler with the KCPR website URI.
+        """
+        """
+        Retrieves the artist name and song title of the currently playing song from the KCPR website.
+        Uses Playwright to open a headless browser, navigate to the KCPR website, and extract the artist name and song title
+        from the relevant HTML elements.
+        Returns:
+            Tuple[str, str]: A tuple containing the artist name and song title.
+        Raises:
+            AssertionError: If the artist name or song title cannot be extracted.
+        """
 
     def __init__(self):
+        """
+        Initializes the Kcpr class with the KCPR website URI.
+
+        Attributes:
+            kcpr_uri (str): The URI of the KCPR website.
+        """
         self.kcpr_uri: str = "https://kcpr.org/"
 
     def get_now_playing(self) -> Tuple[str, str]:
+        """
+        Retrieves the currently playing song's artist name and title from the KCPR website.
+        Uses the Playwright library to open a headless browser, navigate to the KCPR page, and extract
+        the artist name and song title from the page's HTML content.
+        Returns:
+            Tuple[str, str]: A tuple containing the artist name and song title.
+        Raises:
+            AssertionError: If the artist name or song title cannot be extracted.
+        """
 
         with sync_playwright() as p:
 
