@@ -21,13 +21,8 @@ USER_ID: str = os.getenv("USER_ID")
 PLAYLIST_ID: str = os.getenv("PLAYLIST_ID")
 
 # Log initializers
-stdout_handler = logging.StreamHandler(sys.stdout)
-file_handler = logging.FileHandler('logs.log')
 coloredlogs.install(level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.addHandler(stdout_handler)
-logger.addHandler(file_handler)
-
 
 class KcprSpotifyScheduler():
     """
@@ -109,12 +104,14 @@ class KcprSpotifyScheduler():
         # Convert the format to a string of the format "artist - song"
         query: str = f"{artist} - {song}"
 
-        # If first request after restarting, do nothing.
+        logger.info(f"Query: {query}")
+
+        # If first request after restarting, set the previous data to the current song.
         if self.prev_data is None:
             self.prev_data = query
         # If we have new data
         if self.prev_data != query:
-            logger.debug(f"Now playing: {query}")
+            logger.info(f"Now playing: {query}")
             # Get the track from Spotify
             track_uri: str = self.spotify_handler.get_track(
                 artist_name=artist, title=song, similarity_threshold=0.30)
@@ -124,7 +121,7 @@ class KcprSpotifyScheduler():
                 self.spotify_handler.add_track_to_playlist(
                     playlist_id=PLAYLIST_ID, track_id=track_uri)
                 self.spotify_playlist_track_uris.append(track_uri)
-                logger.debug(f"Added track to playlist: {query}")
+                logger.info(f"Added track to playlist: {query}")
 
                 # Log the event in the format: DD MM YYYY HH:MM:SS - [query](link to spotify track)
                 # Get track ID since Spotify URIs are in the format spotify:track:track_id
@@ -136,26 +133,29 @@ class KcprSpotifyScheduler():
                 # Update the previous data to be currently playing song.
                 self.prev_data = query
 
+                logger.info(f"Set previous data to: {query}")
+
                 # Add the track ID to the playlist track IDs to avoid duplicates.
                 self.spotify_playlist_track_uris.append(track_uri)
 
             else:
-                logger.debug(f"Track already in playlist: {query}")
-        else:
-            logger.debug("No new data...")
+                logger.info(f"Track already in playlist: {query}")
 
     def schedule(self):
-        logger.debug("Scheduler started.")
+        logger.info("Scheduler started.")
         schedule.every().minute.do(self.__spotify_kcpr_event)
 
 
 if __name__ == "__main__":
-    kcpr_scheduler: KcprSpotifyScheduler = KcprSpotifyScheduler()
-    kcpr_scheduler.schedule()
+    try:
+        kcpr_scheduler: KcprSpotifyScheduler = KcprSpotifyScheduler()
+        kcpr_scheduler.schedule()
 
-    while True:
-        # Run the scheduler
-        schedule.run_pending()
-        # Usually adding a sleep(1) or even sleep(0.001) in a small infinite loop is done to prevent python from using 100% of a core of your CPU.
-        # See: https://stackoverflow.com/questions/373335/how-do-i-get-a-cron-like-scheduler-in-python
-        time.sleep(1)
+        while True:
+            # Run the scheduler
+            schedule.run_pending()
+            # Usually adding a sleep(1) or even sleep(0.001) in a small infinite loop is done to prevent python from using 100% of a core of your CPU.
+            # See: https://stackoverflow.com/questions/373335/how-do-i-get-a-cron-like-scheduler-in-python
+            time.sleep(1)
+    except Exception as e:
+        logger.warning(f"Error in main loop: {e}")

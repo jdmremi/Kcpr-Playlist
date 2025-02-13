@@ -1,5 +1,12 @@
 from typing import Tuple
+import logging
+import coloredlogs
+import sys
 from playwright.sync_api import sync_playwright, Browser, Page
+
+# Log initializers
+coloredlogs.install(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class KcprHandler:
     """
@@ -46,6 +53,8 @@ class KcprHandler:
             song_title: str = page.locator("div.ssiEncore_songTitle").inner_text()
 
             assert artist_name != "" and song_title != "", "Unable to extract artist name and song title from KCPR."
+
+            logger.info(f"Artist: {artist_name}, Song: {song_title}")
 
             # Close browser to free resources
             browser.close()

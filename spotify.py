@@ -6,12 +6,8 @@ from spotipy.oauth2 import SpotifyOAuth
 from difflib import SequenceMatcher
 
 # Log initializers
-stdout_handler = logging.StreamHandler(sys.stdout)
-file_handler = logging.FileHandler('logs.log')
 coloredlogs.install(level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.addHandler(stdout_handler)
-logger.addHandler(file_handler)
 
 
 class SpotifyAuthManager:
@@ -88,7 +84,7 @@ class SpotifyAuthManager:
 
         # Here's a lazy workaround for the issue mentioned above.
         try:
-            logger.debug(f"Track IDs to be added = {tracks}")
+            logger.info(f"Track IDs to be added = {tracks}")
             # If more than 99 tracks, we need to split it into chunks.
             if len(tracks) >= 99:
                 chunks: list[list] = Utils.divide_chunks(tracks)
@@ -149,8 +145,6 @@ class SpotifyAuthManager:
         if artist_similarity >= similarity_threshold and title_similarity >= similarity_threshold:
             as_percentage: float = artist_similarity * 100.0
             ts_percentage: float = title_similarity * 100.0
-            print(f"Artist similarity: {
-                  as_percentage:.2f}% | Title similarity: {ts_percentage:.2f}%")
             album_tracks_query: dict = self.spotify.album_tracks(
                 album_id=album_id)
             return [track["uri"] for track in album_tracks_query["items"]]
@@ -187,8 +181,6 @@ class SpotifyAuthManager:
         if artist_similarity >= similarity_threshold and title_similarity >= similarity_threshold:
             as_percentage: float = artist_similarity * 100.0
             ts_percentage: float = title_similarity * 100.0
-            print(f"Artist similarity: {
-                  as_percentage:.2f}% | Title similarity: {ts_percentage:.2f}%")
             return track["uri"]
 
         return ""
