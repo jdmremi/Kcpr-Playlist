@@ -169,6 +169,7 @@ class SpotifyAuthManager:
         tracks: list = track_query["tracks"]["items"]
 
         track: dict = tracks[0]
+
         if similarity_threshold == 0.0:
             return track["uri"]
 
@@ -181,6 +182,7 @@ class SpotifyAuthManager:
         if artist_similarity >= similarity_threshold and title_similarity >= similarity_threshold:
             as_percentage: float = artist_similarity * 100.0
             ts_percentage: float = title_similarity * 100.0
+            logger.info(f"Artist similarity: {as_percentage:.2f}% | Title similarity: {ts_percentage:.2f}%")
             return track["uri"]
 
         return ""
