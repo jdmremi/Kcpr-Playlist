@@ -154,22 +154,26 @@ class KcprSpotifyService:
 
             # If the track is not in our playlist, then we'll add it.
             if not track_uri in self.spotify_playlist_track_uris:
-                # Add the track to the playlist
-                self.spotify_handler.add_track_to_playlist(
-                    playlist_id=PLAYLIST_ID, track_id=track_uri)
-                # Add the track to the list of tracks in the playlist
-                self.spotify_playlist_track_uris.append(track_uri)
-                logger.debug(f"Added track to playlist: {query}")
 
-                # Log the event in the format: DD MM YYYY HH:MM:SS - [query](link to spotify track)
-                # Get track ID since Spotify URIs are in the format spotify:track:track_id
-                track_id: str = track_uri.split(":")[-1]
-                # Log to file
-                logger.info(
-                    f"{datetime.now()} {query} (https://open.spotify.com/track/{track_id})")
+                if track_uri is None:
+                    logger.warning(f"Track not found on Spotify: {query}")
+                else:
+                    # Add the track to the playlist
+                    self.spotify_handler.add_track_to_playlist(
+                        playlist_id=PLAYLIST_ID, track_id=track_uri)
+                    # Add the track to the list of tracks in the playlist
+                    self.spotify_playlist_track_uris.append(track_uri)
+                    logger.debug(f"Added track to playlist: {query}")
 
-                # Add the track ID to the playlist track IDs to avoid duplicates.
-                self.spotify_playlist_track_uris.append(track_uri)
+                    # Log the event in the format: DD MM YYYY HH:MM:SS - [query](link to spotify track)
+                    # Get track ID since Spotify URIs are in the format spotify:track:track_id
+                    track_id: str = track_uri.split(":")[-1]
+                    # Log to file
+                    logger.info(
+                        f"{datetime.now()} {query} (https://open.spotify.com/track/{track_id})")
+
+                    # Add the track ID to the playlist track IDs to avoid duplicates.
+                    self.spotify_playlist_track_uris.append(track_uri)
 
             else:
                 logger.warning(f"Track already in playlist: {query}")
