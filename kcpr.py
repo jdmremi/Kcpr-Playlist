@@ -155,7 +155,7 @@ class KcprSpotifyService:
             # If the track is not in our playlist, then we'll add it.
             if not track_uri in self.spotify_playlist_track_uris:
 
-                if track_uri is None:
+                if track_uri == '':
                     logger.warning(f"Track not found on Spotify: {query}")
                 else:
                     # Add the track to the playlist
