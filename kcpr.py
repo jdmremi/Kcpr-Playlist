@@ -173,8 +173,6 @@ class KcprSpotifyService:
 
                     # Add the track ID to the playlist track IDs to avoid duplicates.
                     self.spotify_playlist_track_uris.append(track_id)
-                    print(self.spotify_playlist_track_uris)
-
 
             else:
                 logger.warning(f"Track already in playlist: {query}")
